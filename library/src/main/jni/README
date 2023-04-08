@@ -1,11 +1,3 @@
-Fork from http://traceroute.sourceforge.net   
-How to build with Android NDK ?   
-Please switch to android-ver branch.  
-如何编译Android版本？请切换到 android-ver 分支.
-
-
-##traceroute
-
 This is a new modern implementation of the traceroute(8)
 utility for Linux systems.
 

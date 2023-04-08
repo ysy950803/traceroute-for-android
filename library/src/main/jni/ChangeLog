@@ -1,3 +1,19 @@
+2023-02-13  Dmitry Butskoy  <Dmitry@Butskoy.name> - 2.1.2
+
+	*  Fix unprivileged ICMP tracerouting with Linux kernel >= 6.1
+	   (Eric Dumazet, SF bug #14)
+
+2022-12-27  Dmitry Butskoy  <Dmitry@Butskoy.name> - 2.1.1
+
+	*  Interpret ipv4-mapped ipv6 addresses (::ffff:A.B.C.D) as true ipv4.
+
+	   There are no ipv4-mapped addresses in the real network which we
+	   operate on, so use just ipv4 in such cases, but allow users
+	   to specify it this way for convenience.
+
+	*  Return back more robast poll(2) loop handling.
+
+
 2016-03-08  Dmitry Butskoy  <Dmitry@Butskoy.name> - 2.1.0
 
 	*  Improve the main loop for better interactivity.

@@ -13,10 +13,7 @@
 #include <fcntl.h>
 #include <sys/socket.h>
 #include <poll.h>
-//#include <netinet/icmp6.h>
-
-#include "libsupp/icmp6.h"
-
+#include <netinet/icmp6.h>
 #include <netinet/ip_icmp.h>
 #include <netinet/in.h>
 #include <netinet/ip6.h>
@@ -27,7 +24,6 @@
 #include <linux/types.h>
 #include <linux/errqueue.h>
 
-#include <linux/icmp.h>
 /*  XXX: Remove this when things will be defined properly in netinet/ ...  */
 //#include "flowlabel.h"
 
@@ -152,7 +148,7 @@ static void ex_error (const char *format, ...) {
 
 	fprintf (stderr, "\n");
 
-    exit(2);
+	exit (2);
 }
 
 void error (const char *str) {
@@ -161,7 +157,7 @@ void error (const char *str) {
 
 	perror (str);
 
-    exit(1);
+	exit (1);
 }
 
 void error_or_perm (const char *str) {
@@ -226,6 +222,15 @@ static int getaddr (const char *name, sockaddr_any *addr) {
 	memcpy (addr, ai->ai_addr, ai->ai_addrlen);
 
 	freeaddrinfo (res);
+
+	/*  No v4mapped addresses in real network, interpret it as ipv4 anyway   */
+	if (addr->sa.sa_family == AF_INET6 &&
+	    IN6_IS_ADDR_V4MAPPED (&addr->sin6.sin6_addr)
+	) {
+	    if (af == AF_INET6)  return -1;
+	    addr->sa.sa_family = AF_INET;
+	    addr->sin.sin_addr.s_addr = addr->sin6.sin6_addr.s6_addr32[3];
+	}
 
 	return 0;
 }
@@ -422,8 +427,8 @@ static int set_mod_option (CLIF_option *optn, char *arg) {
 	    } else
 		fprintf (stderr, "No options for module `%s'\n", module);
 
-        exit(0);
-    }
+	    exit (0);
+	}
 
 	if (opts_idx >= sizeof (opts) / sizeof (*opts))  {
 	    fprintf (stderr, "Too many module options\n");
@@ -607,20 +612,21 @@ static CLIF_argument arg_list[] = {
 };
 
 
-static void do_it(void);
+static void do_it (void);
 
-int exec(int argc, char *argv[]) {
 //int main (int argc, char *argv[]) {
+int exec(int argc, char *argv[]) {
 
-    setlocale(LC_ALL, "");
-    setlocale(LC_NUMERIC, "C");    /*  avoid commas in msec printed  */
+	setlocale (LC_ALL, "");
+	setlocale (LC_NUMERIC, "C");	/*  avoid commas in msec printed  */
 
-    check_progname(argv[0]);
+	check_progname (argv[0]);
 
-    if (CLIF_parse(argc, argv, option_list, arg_list,
-                   CLIF_MAY_JOIN_ARG | CLIF_HELP_EMPTY) < 0) {
-        exit(2);
-    }
+
+	if (CLIF_parse (argc, argv, option_list, arg_list,
+				CLIF_MAY_JOIN_ARG | CLIF_HELP_EMPTY) < 0
+	)  exit (2);
+
 
 	ops = tr_get_module (module);
 	if (!ops)  ex_error ("Unknown traceroute module %s", module);
@@ -692,15 +698,15 @@ int exec(int argc, char *argv[]) {
 	if (!probes)  error ("calloc");
 
 
-    if (ops->options && opts_idx > 1) {
-        opts[0] = strdup(module);        /*  aka argv[0] ...  */
-        if (CLIF_parse(opts_idx, opts, ops->options, 0, CLIF_KEYWORD) < 0) {
-            exit(2);
-        }
-    }
+	if (ops->options && opts_idx > 1) {
+	    opts[0] = strdup (module);	    /*  aka argv[0] ...  */
+	    if (CLIF_parse (opts_idx, opts, ops->options, 0, CLIF_KEYWORD) < 0)
+		    exit (2);
+	}
 
 	if (ops->init (&dst_addr, dst_port_seq, &data_len) < 0)
 		ex_error ("trace method's init failed");
+
 
 	do_it ();
 
@@ -1649,7 +1655,7 @@ int do_send (int sk, const void *data, size_t len, const sockaddr_any *addr) {
 	if (res < 0) {
 	    if (errno == ENOBUFS || errno == EAGAIN)
 		    return res;
-	    if (errno == EMSGSIZE)
+	    if (errno == EMSGSIZE || errno == EHOSTUNREACH)
 		    return 0;	/*  recverr will say more...  */
 	    error ("send");	/*  not recoverable   */
 	}

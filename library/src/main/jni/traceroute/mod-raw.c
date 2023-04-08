@@ -10,9 +10,7 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <poll.h>
-//#include <netinet/icmp6.h>
-
-#include "libsupp/icmp6.h"    
+#include <netinet/icmp6.h>
 #include <netinet/ip_icmp.h>
 #include <netinet/in.h>
 #include <netinet/ip.h>

@@ -11,17 +11,12 @@
 #include <fcntl.h>
 #include <sys/socket.h>
 #include <poll.h>
-//#include <netinet/icmp6.h>
-
-#include "libsupp/icmp6.h"
+#include <netinet/icmp6.h>
 #include <netinet/ip_icmp.h>
 #include <netinet/in.h>
 #include <netinet/ip.h>
 #include <netinet/ip6.h>
 #include <netinet/tcp.h>
-    
-#include "libsupp/tcp.h"
-//#include <linux/tcp.h>
 
 
 #include "traceroute.h"

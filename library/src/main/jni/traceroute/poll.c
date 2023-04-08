@@ -64,28 +64,23 @@ static int cleanup_polls (void) {
 
 
 void do_poll (double timeout, void (*callback) (int fd, int revents)) {
-	int nfds;
-	int msecs = ceil (timeout * 1000);
+	int nfds, n, i;
 
-	while ((nfds = cleanup_polls ()) > 0) {
-	    int i, n;
+	nfds = cleanup_polls ();
 
-	    n = poll (pfd, nfds, msecs);
+	if (!nfds)  return;
 
-	    if (n <= 0) {
-		if (n == 0 || errno == EINTR)
-			return;
-		error ("poll");
+	n = poll (pfd, nfds, ceil(timeout * 1000));
+	if (n < 0) {
+	    if (errno == EINTR)  return;
+	    error ("poll");
+	}
+
+	for (i = 0; n && i < num_polls; i++) {
+	    if (pfd[i].revents) {
+		callback (pfd[i].fd, pfd[i].revents);
+		n--;
 	    }
-
-	    for (i = 0; n && i < num_polls; i++) {
-		if (pfd[i].revents) {
-		    callback (pfd[i].fd, pfd[i].revents);
-		    n--;
-		}
-	    }
-
-	    msecs = 0;	    /*  no more wait, just eat all the pending   */
 	}
 
 	return;

@@ -80,7 +80,7 @@ object TraceRoute {
      */
     @Synchronized
     fun traceRoute(hostname: String, async: Boolean = false): TraceRouteResult? {
-        val args = arrayOf("traceroute", hostname)
+        val args = arrayOf("traceroute", "-I", hostname)
         if (async) {
             Thread({
                 traceRoute(args)

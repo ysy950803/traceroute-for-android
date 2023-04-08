@@ -1,6 +1,6 @@
 Summary: Traces the route taken by packets over an IPv4/IPv6 network
 Name: traceroute
-Version: 2.1.0
+Version: 2.1.2
 Release: 1%{?dist}
 Group: Applications/Internet
 License: GPLv2+
