@@ -3,6 +3,7 @@
           package="com.wandroid.traceroute.sample">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS"/>
 
     <application
         android:allowBackup="true"
